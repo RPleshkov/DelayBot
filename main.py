@@ -3,6 +3,7 @@ import logging
 
 from aiogram import Bot, Dispatcher
 
+from handlers import routers
 from config.config import Config, load_config
 from storage.nats_storage import NatsStorage
 from utils.nats_connect import connect_to_nats
@@ -23,6 +24,9 @@ async def main():
 
     bot = Bot(config.telegram_bot.token)
     dp = Dispatcher(storage=storage)
+
+    # Подключаем роутеры
+    dp.include_routers(*routers())
 
     try:
         await dp.start_polling(bot)
