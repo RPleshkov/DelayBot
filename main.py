@@ -7,6 +7,7 @@ from handlers import routers
 from config import Config, load_config
 from storage.nats_storage import NatsStorage
 from utils.nats_connect import connect_to_nats
+from utils.start_consumers import start_delayed_consumer
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -29,7 +30,21 @@ async def main():
     dp.include_routers(*routers())
 
     try:
-        await dp.start_polling(bot)
+        await asyncio.gather(
+            dp.start_polling(
+                bot,
+                js=js,
+                delay_subject=config.delayed_consumer.subject,
+            ),
+            start_delayed_consumer(
+                nc=nc,
+                js=js,
+                bot=bot,
+                subject=config.delayed_consumer.subject,
+                stream=config.delayed_consumer.stream,
+                durable_name=config.delayed_consumer.durable_name,
+            ),
+        )
     except Exception as e:
         logger.exception(e)
     finally:
