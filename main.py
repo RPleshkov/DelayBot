@@ -4,7 +4,7 @@ import logging
 from aiogram import Bot, Dispatcher
 
 from handlers import routers
-from config.config import Config, load_config
+from config import Config, load_config
 from storage.nats_storage import NatsStorage
 from utils.nats_connect import connect_to_nats
 
