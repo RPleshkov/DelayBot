@@ -1,5 +1,6 @@
 from nats.js.client import JetStreamContext
 from datetime import datetime
+from uuid import uuid4
 
 
 async def delay_send_message(
@@ -10,6 +11,7 @@ async def delay_send_message(
     delay: int = 0,
 ) -> None:
     headers = {
+        "ID": str(uuid4()),
         "Tg-Delayed-Chat-ID": str(chat_id),
         "Tg-Delayed-Msg-ID": str(message_id),
         "Tg-Delayed-Msg-Timestamp": str(datetime.now().timestamp()),

@@ -27,7 +27,10 @@ async def cmd_send_process(msg: Message, state: FSMContext):
 
 @router.message(StateFilter(FSMSendMessage.SEND))
 async def get_message(
-    msg: Message, state: FSMContext, js: JetStreamContext, delay_subject: str
+    msg: Message,
+    state: FSMContext,
+    js: JetStreamContext,
+    delay_subject: str,
 ):
 
     delay = 5

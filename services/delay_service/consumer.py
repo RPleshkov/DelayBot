@@ -8,6 +8,10 @@ from aiogram.exceptions import TelegramBadRequest
 from nats.aio.client import Client
 from nats.aio.msg import Msg
 from nats.js import JetStreamContext
+from nats.js.api import KeyValueConfig, Placement, StorageType
+import ormsgpack
+
+from keyboards.keyboards import confirm_receipt
 
 logger = logging.getLogger(__name__)
 
@@ -54,12 +58,17 @@ class DelayedMessageConsumer:
             # Отправляем nak с временем задержки
             await msg.nak(delay=new_delay)
         else:
-            # Если время обработки наступило - пытаемся удалить сообщение в чате
+
+            id = msg.headers.get("ID")
             chat_id = msg.headers.get("Tg-Delayed-Chat-ID")
             message_id = msg.headers.get("Tg-Delayed-Msg-ID")
-            await self.bot.forward_message(
-                chat_id=chat_id, from_chat_id=chat_id, message_id=message_id
+            await self.bot.copy_message(
+                chat_id=chat_id,
+                from_chat_id=chat_id,
+                message_id=message_id,
+                reply_markup=confirm_receipt(id),
             )
+
             await msg.ack()
 
     async def unsubscribe(self) -> None:
